@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prorate Calculator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap');
+
+  :root {
+    --bg-card: #191919;
+    --bg-page: transparent;
+    --input-bg: #ffffff;
+    --input-text: #5c2a1a;
+    --input-border-focus: #2f5fd6;
+    --accent: #ffffff;
+    --result-bg: #232323;
+    --result-accent: #8fd19e;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-page);
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border-radius: 28px;
+    padding: 36px 32px 32px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+
+  h1 {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.25;
+    margin: 4px 0 28px;
+    letter-spacing: -0.01em;
+  }
+
+  .field {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .field input {
+    width: 100%;
+    background: var(--input-bg);
+    border: 2px solid var(--input-bg);
+    border-radius: 12px;
+    padding: 16px 44px 16px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--input-text);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .field input::placeholder {
+    color: var(--input-text);
+    opacity: 0.85;
+    font-weight: 700;
+  }
+
+  .field input:focus {
+    border-color: var(--input-border-focus);
+  }
+
+  .field .icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--input-text);
+    opacity: 0.8;
+  }
+
+  .field .icon svg { width: 20px; height: 20px; display: block; }
+
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  button.calculate {
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: #ffffff;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 12px 32px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  button.calculate:hover {
+    background: #ffffff;
+    color: #191919;
+  }
+
+  button.calculate:active {
+    transform: scale(0.98);
+  }
+
+  .result {
+    margin-top: 24px;
+    background: var(--result-bg);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: none;
+  }
+
+  .result.show { display: block; animation: fadeIn 0.25s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result .label {
+    color: #9a9a9a;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .result .amount {
+    color: var(--result-accent);
+    font-size: 30px;
+    font-weight: 800;
+  }
+
+  .result .detail {
+    color: #cfcfcf;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .error {
+    color: #ff9b9b;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 14px;
+    display: none;
+  }
+
+  .error.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Calculate Your Rent<br>Below&hellip;</h1>
+
+  <div class="field">
+    <input type="text" id="rentAmount" inputmode="decimal" placeholder="Rent Amount" autocomplete="off">
+  </div>
+
+  <div class="field">
+    <input type="date" id="moveInDate" placeholder="Move in Date">
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none"/></svg>
+    </span>
+  </div>
+
+  <div class="field">
+    <select id="billOn" style="width:100%; background:var(--input-bg); border:2px solid var(--input-bg); border-radius:12px; padding:16px 18px; font-family:'Nunito',sans-serif; font-size:15px; font-weight:700; color:var(--input-text); outline:none; appearance:none; -webkit-appearance:none; cursor:pointer;">
+      <option value="" disabled selected>Bill On</option>
+      <option value="1">1st of the month</option>
+      <option value="15">15th of the month</option>
+    </select>
+  </div>
+
+  <div class="btn-row">
+    <button class="calculate" onclick="calculateProration()">calculate</button>
+  </div>
+
+  <div class="error" id="errorMsg">Please fill in all fields.</div>
+
+  <div class="result" id="result">
+    <div class="label">Prorated Amount Due</div>
+    <div class="amount" id="resultAmount">$0.00</div>
+    <div class="detail" id="resultDetail"></div>
+  </div>
+</div>
+
+<script>
+function daysInMonth(year, monthIndex) {
+  return new Date(year, monthIndex + 1, 0).getDate();
+}
+
+function calculateProration() {
+  const rentInput = document.getElementById('rentAmount').value.replace(/[^0-9.]/g, '');
+  const moveInVal = document.getElementById('moveInDate').value;
+  const billOn = document.getElementById('billOn').value;
+  const errorEl = document.getElementById('errorMsg');
+  const resultEl = document.getElementById('result');
+
+  const rent = parseFloat(rentInput);
+
+  if (!rent || rent <= 0 || !moveInVal || !billOn) {
+    errorEl.classList.add('show');
+    resultEl.classList.remove('show');
+    return;
+  }
+  errorEl.classList.remove('show');
+
+  const billDay = parseInt(billOn, 10);
+  const [y, m, d] = moveInVal.split('-').map(Number);
+  const moveIn = new Date(y, m - 1, d);
+
+  // Determine the next billing date on/after move-in
+  let nextBill = new Date(y, m - 1, billDay);
+  if (moveIn.getDate() >= billDay) {
+    nextBill = new Date(y, m, billDay); // roll to next month
+  }
+
+  const totalDaysInCycleMonth = daysInMonth(moveIn.getFullYear(), moveIn.getMonth());
+  const dailyRate = rent / totalDaysInCycleMonth;
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const proratedDays = Math.round((nextBill - moveIn) / msPerDay);
+
+  const proratedAmount = dailyRate * proratedDays;
+
+  document.getElementById('resultAmount').textContent =
+    '$' + proratedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const fmt = (dt) => dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('resultDetail').textContent =
+    proratedDays + ' day' + (proratedDays === 1 ? '' : 's') + ' (' + fmt(moveIn) + ' \u2192 ' + fmt(nextBill) + ') at $' +
+    dailyRate.toFixed(2) + '/day';
+
+  resultEl.classList.add('show');
+}
+
+document.getElementById('rentAmount').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') calculateProration();
+});
+</script>
+
+</body>
+</html>

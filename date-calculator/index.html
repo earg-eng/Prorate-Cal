@@ -25,7 +25,7 @@
     padding:20px;
   }
   .card{
-    max-width:480px;
+    max-width:320px;
     margin:0 auto;
     border:1px solid var(--line);
     border-radius:var(--radius);
@@ -46,38 +46,41 @@
     background:#fff;
   }
   .result-date{
-    font-size:22px;
+    font-size:20px;
     font-weight:700;
     color:var(--green-dark);
     margin:0 0 6px;
   }
   .result-sub{
-    font-size:14px;
+    font-size:13px;
     color:var(--muted);
     margin:0;
   }
   .form{
     padding:20px;
     background:var(--panel);
-  }
-  .row{
     display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:14px;
+    flex-direction:column;
+    gap:14px;
   }
-  .row label.field-label{
-    width:88px;
-    flex:0 0 88px;
-    font-size:13px;
-    font-weight:600;
+  .field-block{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .field-block .field-label{
+    font-size:12px;
+    font-weight:700;
     color:var(--ink);
+    text-transform:uppercase;
+    letter-spacing:.03em;
   }
   select, input[type="number"], input[type="text"]{
+    width:100%;
     font-size:14px;
-    padding:7px 8px;
+    padding:9px 10px;
     border:1px solid var(--blue-line);
-    border-radius:4px;
+    border-radius:6px;
     background:#fff;
     color:var(--ink);
   }
@@ -85,19 +88,15 @@
     outline:2px solid var(--green);
     outline-offset:1px;
   }
-  .start-date-row select#month{ width:88px; }
-  .start-date-row select#day{ width:64px; }
-  .start-date-row input#year{ width:76px; }
   .op-toggle{
     display:flex;
     border:1px solid var(--blue-line);
     border-radius:6px;
     overflow:hidden;
-    flex:0 0 auto;
-    height:34px;
+    height:38px;
   }
   .op-toggle button{
-    width:34px;
+    flex:1 1 50%;
     border:none;
     background:#fff;
     font-size:16px;
@@ -110,31 +109,15 @@
     color:#fff;
   }
   .op-toggle button:first-child{ border-right:1px solid var(--blue-line); }
-  .delta-grid{
-    flex:1;
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:8px;
-  }
-  .delta-grid .unit{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-  }
-  .delta-grid input{
-    width:100%;
-    text-align:center;
-  }
-  .delta-grid .unit-label{
-    font-size:11px;
-    color:var(--muted);
-    text-align:center;
+  .section-divider{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:2px 0;
   }
   .biz-row{
     display:flex;
     align-items:center;
     gap:8px;
-    margin:6px 0 18px;
     font-size:13px;
     color:var(--ink);
   }
@@ -168,38 +151,47 @@
   </div>
 
   <div class="form">
-    <div class="row start-date-row">
-      <span class="field-label">Start Date</span>
+    <div class="field-block">
+      <label class="field-label" for="month">Month</label>
       <select id="month" aria-label="Month"></select>
+    </div>
+    <div class="field-block">
+      <label class="field-label" for="day">Day</label>
       <select id="day" aria-label="Day"></select>
+    </div>
+    <div class="field-block">
+      <label class="field-label" for="year">Year</label>
       <input type="text" id="year" aria-label="Year" maxlength="4" inputmode="numeric">
     </div>
 
-    <div class="row">
+    <hr class="section-divider">
+
+    <div class="field-block">
       <span class="field-label">Adjust by</span>
       <div class="op-toggle" role="group" aria-label="Add or subtract">
-        <button type="button" id="opAdd" class="active">+</button>
-        <button type="button" id="opSub">−</button>
-      </div>
-      <div class="delta-grid">
-        <div class="unit">
-          <input type="number" id="years" min="0" value="0">
-          <span class="unit-label">years</span>
-        </div>
-        <div class="unit">
-          <input type="number" id="months" min="0" value="0">
-          <span class="unit-label">months</span>
-        </div>
-        <div class="unit">
-          <input type="number" id="weeks" min="0" value="0">
-          <span class="unit-label">weeks</span>
-        </div>
-        <div class="unit">
-          <input type="number" id="days" min="0" value="0">
-          <span class="unit-label">days</span>
-        </div>
+        <button type="button" id="opAdd" class="active">+ Add</button>
+        <button type="button" id="opSub">− Subtract</button>
       </div>
     </div>
+
+    <div class="field-block">
+      <label class="field-label" for="years">Years</label>
+      <input type="number" id="years" min="0" value="0">
+    </div>
+    <div class="field-block">
+      <label class="field-label" for="months">Months</label>
+      <input type="number" id="months" min="0" value="0">
+    </div>
+    <div class="field-block">
+      <label class="field-label" for="weeks">Weeks</label>
+      <input type="number" id="weeks" min="0" value="0">
+    </div>
+    <div class="field-block">
+      <label class="field-label" for="days">Days</label>
+      <input type="number" id="days" min="0" value="0">
+    </div>
+
+    <hr class="section-divider">
 
     <label class="biz-row">
       <input type="checkbox" id="bizDays">
@@ -301,10 +293,8 @@
   }
 
   function formatLong(date){
-    return MONTH_NAMES[date.getMonth()].replace(/^(...).*/, function(m){
-      var full = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      return full[date.getMonth()];
-    }) + ' ' + date.getDate() + ordinalSuffix(date.getDate()) + ', ' + date.getFullYear() + ', ' + WEEKDAY_NAMES[date.getDay()];
+    var full = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    return full[date.getMonth()] + ' ' + date.getDate() + ordinalSuffix(date.getDate()) + ', ' + date.getFullYear() + ', ' + WEEKDAY_NAMES[date.getDay()];
   }
 
   function calculate(){
@@ -348,7 +338,7 @@
     var directionText = mode === 'sub' ? 'before' : 'after';
     var bizText = bizDays.checked ? ' (business days)' : '';
 
-    resultSub.textContent = 'is the date ' + amountText + directionText.replace(/^/, ' ') + ' ' +
+    resultSub.textContent = 'is the date ' + amountText + ' ' + directionText + ' ' +
       MONTH_NAMES[start.getMonth()] + ' ' + start.getDate() + ', ' + start.getFullYear() + bizText;
   }
 
